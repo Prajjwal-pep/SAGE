@@ -1,20 +1,83 @@
 """
-Generate SBERT embeddings for regulation clauses.
+Generate ESG-BERT embeddings for regulation clauses.
 Input: environmental.json, social.json, governance.json (from classification)
 Output: environmental_reg.json, social_reg.json, governance_reg.json
 """
-
 import json
 from pathlib import Path
-from sentence_transformers import SentenceTransformer
+from transformers import AutoTokenizer, AutoModel
+import torch
+import numpy as np
+from tqdm import tqdm
 
-# Load SBERT model
-print("Loading Sentence-BERT model...")
-model = SentenceTransformer('all-MiniLM-L6-v2')
-print("Model loaded!\n")
+class ESGBERTEmbedder:
+    """Wrapper for ESG-BERT to generate sentence embeddings."""
+    
+    def __init__(self, model_name='nbroad/ESG-BERT', device=None):
+        """Initialize ESG-BERT model and tokenizer."""
+        self.device = device or ('cuda' if torch.cuda.is_available() else 'cpu')
+        print(f"Loading ESG-BERT model on {self.device}...")
+        
+        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+        self.model = AutoModel.from_pretrained(model_name).to(self.device)
+        self.model.eval()
+        
+        print("✓ Model loaded!\n")
+    
+    def mean_pooling(self, token_embeddings, attention_mask):
+        """Apply mean pooling to get sentence embeddings."""
+        input_mask_expanded = attention_mask.unsqueeze(-1).expand(token_embeddings.size()).float()
+        return torch.sum(token_embeddings * input_mask_expanded, 1) / torch.clamp(input_mask_expanded.sum(1), min=1e-9)
+    
+    def encode(self, sentences, batch_size=16, show_progress=True):
+        """
+        Generate embeddings for a list of sentences.
+        
+        Args:
+            sentences: List of strings
+            batch_size: Number of sentences to process at once
+            show_progress: Show progress bar
+            
+        Returns:
+            numpy array of embeddings (n_sentences, embedding_dim)
+        """
+        all_embeddings = []
+        
+        iterator = range(0, len(sentences), batch_size)
+        if show_progress:
+            iterator = tqdm(iterator, desc="Generating embeddings")
+        
+        with torch.no_grad():
+            for i in iterator:
+                batch = sentences[i:i + batch_size]
+                
+                # Tokenize
+                encoded = self.tokenizer(
+                    batch,
+                    padding=True,
+                    truncation=True,
+                    max_length=512,
+                    return_tensors='pt'
+                ).to(self.device)
+                
+                # Get embeddings
+                outputs = self.model(**encoded)
+                
+                # Mean pooling
+                embeddings = self.mean_pooling(
+                    outputs.last_hidden_state,
+                    encoded['attention_mask']
+                )
+                
+                # Normalize (optional but recommended for similarity)
+                embeddings = torch.nn.functional.normalize(embeddings, p=2, dim=1)
+                
+                all_embeddings.append(embeddings.cpu().numpy())
+        
+        return np.vstack(all_embeddings)
 
 
-def load_and_embed_category(category_file, category_name, regulation_id):
+def load_and_embed_category(embedder, category_file, category_name, regulation_id):
     """Load clauses, generate embeddings, and structure output."""
     
     # Load classified clauses
@@ -25,7 +88,7 @@ def load_and_embed_category(category_file, category_name, regulation_id):
     print(f"Processing {len(clauses_text)} {category_name} clauses...")
     
     # Generate embeddings
-    embeddings = model.encode(clauses_text, show_progress_bar=True, convert_to_numpy=True)
+    embeddings = embedder.encode(clauses_text, show_progress=True)
     
     # Structure output
     clauses = []
@@ -41,6 +104,8 @@ def load_and_embed_category(category_file, category_name, regulation_id):
     output = {
         "regulation_id": regulation_id,
         "category": category_name,
+        "embedding_model": "nbroad/ESG-BERT",
+        "embedding_dim": embeddings.shape[1],
         "clauses": clauses
     }
     
@@ -54,11 +119,14 @@ def main():
     OUTPUT_DIR = "BRSR_embeddings"  # Where to save embeddings
     
     print("=" * 70)
-    print("EMBED REGULATION CLAUSES")
+    print("EMBED REGULATION CLAUSES WITH ESG-BERT")
     print("=" * 70)
     print(f"Regulation ID: {REGULATION_ID}\n")
     
     Path(OUTPUT_DIR).mkdir(parents=True, exist_ok=True)
+    
+    # Initialize embedder once
+    embedder = ESGBERTEmbedder()
     
     categories = {
         "environmental": "Environmental",
@@ -74,10 +142,10 @@ def main():
             continue
         
         # Process category
-        output_data = load_and_embed_category(input_file, category_name, REGULATION_ID)
+        output_data = load_and_embed_category(embedder, input_file, category_name, REGULATION_ID)
         
         # Save output
-        output_file = Path(OUTPUT_DIR) / f"{file_name}_{OUTPUT_DIR}.json"
+        output_file = Path(OUTPUT_DIR) / f"{file_name}_reg.json"
         with open(output_file, "w", encoding="utf-8") as f:
             json.dump(output_data, f, indent=2, ensure_ascii=False)
         
