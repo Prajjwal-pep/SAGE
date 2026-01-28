@@ -1,0 +1,4 @@
+epoch,steps,accuracy_cosine
+1.0,79,1.0
+2.0,158,1.0
+3.0,237,1.0
