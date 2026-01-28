@@ -1,0 +1,109 @@
+python matching.py
+======================================================================
+ESG SEMANTIC MATCHING & GAP ANALYSIS
+======================================================================
+Category: ENVIRONMENTAL
+
+Loading data from:
+  - ../SAGE-BERT_embeddings/Infosys_embeddings/environmental_disc.json
+  - ../SAGE-BERT_embeddings/BRSR_embeddings/environmental_reg.json
+✓ Loaded 283 disclosure clauses
+✓ Loaded 128 regulation clauses
+
+Computing similarity matrix...
+✓ Similarity matrix computed: (283, 128)
+
+Matching regulations → disclosures (top-3, threshold=0.5)...
+✓ Matched 128 regulations
+
+Matching disclosures → regulations (threshold=0.75)...
+✓ Matched 283 disclosures
+
+Performing gap analysis (threshold=0.75)...
+✓ Gap analysis complete:
+  - Fully covered: 119 (92.97%)
+  - Partially covered: 9
+  - Uncovered: 0
+
+✓ Saved analysis to: matching_output\matching_environmental.json (0.40 MB)
+
+======================================================================
+SUMMARY
+======================================================================
+Total Regulations: 128
+Coverage: 92.97%
+Uncovered Regulations: 0
+Disclosure-Regulation Matches: 283
+======================================================================
+======================================================================
+ESG SEMANTIC MATCHING & GAP ANALYSIS
+======================================================================
+Category: SOCIAL
+
+Loading data from:
+  - ../SAGE-BERT_embeddings/Infosys_embeddings/social_disc.json
+  - ../SAGE-BERT_embeddings/BRSR_embeddings/social_reg.json
+✓ Loaded 480 disclosure clauses
+✓ Loaded 99 regulation clauses
+
+Computing similarity matrix...
+✓ Similarity matrix computed: (480, 99)
+
+Matching regulations → disclosures (top-3, threshold=0.5)...
+✓ Matched 99 regulations
+
+Matching disclosures → regulations (threshold=0.75)...
+✓ Matched 480 disclosures
+
+Performing gap analysis (threshold=0.75)...
+✓ Gap analysis complete:
+  - Fully covered: 83 (83.84%)
+  - Partially covered: 13
+  - Uncovered: 3
+
+✓ Saved analysis to: matching_output\matching_social.json (0.54 MB)
+
+======================================================================
+SUMMARY
+======================================================================
+Total Regulations: 99
+Coverage: 83.84%
+Uncovered Regulations: 3
+Disclosure-Regulation Matches: 480
+======================================================================
+======================================================================
+ESG SEMANTIC MATCHING & GAP ANALYSIS
+======================================================================
+Category: GOVERNANCE
+
+Loading data from:
+  - ../SAGE-BERT_embeddings/Infosys_embeddings/governance_disc.json
+  - ../SAGE-BERT_embeddings/BRSR_embeddings/governance_reg.json
+✓ Loaded 428 disclosure clauses
+✓ Loaded 132 regulation clauses
+
+Computing similarity matrix...
+✓ Similarity matrix computed: (428, 132)
+
+Matching regulations → disclosures (top-3, threshold=0.5)...
+✓ Matched 132 regulations
+
+Matching disclosures → regulations (threshold=0.75)...
+✓ Matched 428 disclosures
+
+Performing gap analysis (threshold=0.75)...
+✓ Gap analysis complete:
+  - Fully covered: 112 (84.85%)
+  - Partially covered: 20
+  - Uncovered: 0
+
+✓ Saved analysis to: matching_output\matching_governance.json (0.49 MB)
+
+======================================================================
+SUMMARY
+======================================================================
+Total Regulations: 132
+Coverage: 84.85%
+Uncovered Regulations: 0
+Disclosure-Regulation Matches: 428
+======================================================================
