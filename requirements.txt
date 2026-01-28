@@ -1,0 +1,62 @@
+# ============================================================================
+# SAGE-BERT: ESG Semantic Matching Pipeline
+# Requirements for extraction, classification, fine-tuning, and matching
+# ============================================================================
+
+# Core ML Libraries
+torch>=2.0.0
+transformers>=4.35.0
+sentence-transformers>=2.2.2
+
+# Data Processing
+pandas>=2.0.0
+numpy>=1.24.0
+scikit-learn>=1.3.0
+
+# PDF Processing
+PyMuPDF>=1.23.0
+
+# Progress Bars
+tqdm>=4.65.0
+
+# Dataset Handling (required by sentence-transformers)
+datasets>=2.14.0
+
+# Utilities
+pathlib
+python-dateutil>=2.8.0
+
+# Optional but Recommended
+# ============================================================================
+
+# For GPU support (choose one based on your CUDA version)
+# torch>=2.0.0+cu118  # CUDA 11.8
+# torch>=2.0.0+cu121  # CUDA 12.1
+
+# For faster training
+# accelerate>=0.20.0
+
+# For better logging
+# wandb>=0.15.0  # If you want to track experiments
+
+# ============================================================================
+# Installation Instructions:
+# ============================================================================
+# 
+# Basic installation (CPU):
+#   pip install -r requirements.txt
+#
+# With GPU support (CUDA 11.8):
+#   pip install -r requirements.txt
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118
+#
+# With GPU support (CUDA 12.1):
+#   pip install -r requirements.txt
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
+#
+# ============================================================================
+# Tested Versions:
+# ============================================================================
+# Python: 3.9, 3.10, 3.11
+# OS: Windows 10/11, Ubuntu 20.04/22.04, macOS 12+
+# ============================================================================
